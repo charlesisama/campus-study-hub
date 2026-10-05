@@ -11,7 +11,10 @@ router.get('/', (req, res) => {
 });
 
 // Mounting route modules
+router.use('/auth', require('./auth'))
 router.use('/users', require('./users'));
 router.use('/groups', require('./groups'));
+router.use('/sessions', require('./sessions'))
+router.use('/resources', require('./resources'))
 
 module.exports = router;

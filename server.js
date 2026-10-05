@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
+const errorHandler = require('./middleware/errorHandler');
+
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 
 // Main Routes
 app.use('/', require('./routes/index.js'));
+app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
