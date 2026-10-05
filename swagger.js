@@ -1,26 +1,30 @@
 const swaggerAutogen = require('swagger-autogen')();
 
-const isProduction = process.env.RENDER === "true";
+const port = process.env.PORT || 8080;
+const isProduction = process.env.RENDER === 'true';
 
 const doc = {
     info: {
         title: 'Campus Study Hub API',
-        description: 'API for managing study groups, users, sessions, and resources.',
+        description:
+            'RESTful API for managing university study groups, users, study sessions, and learning resources.',
         version: '1.0.0'
     },
-   
-    host: isProduction
-        ? "https://campus-study-hub-fphx.onrender.com"
-        : "localhost:3000",
 
-    basePath: "/",
+    host: isProduction
+        ? 'campus-study-hub-fphx.onrender.com'
+        : `localhost:${port}`,
+
+    basePath: '/',
 
     schemes: isProduction
-        ? ["https"]
-        : ["http"],
+        ? ['https']
+        : ['http']
 };
 
 const outputFile = './swagger/swagger.json';
 const endpointsFiles = ['./routes/index.js'];
 
-swaggerAutogen(outputFile, endpointsFiles, doc);
+swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+    console.log('Swagger documentation generated successfully.');
+});

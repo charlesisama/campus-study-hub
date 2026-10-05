@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "node --watch server.js",
+    "start": "node swagger.js && node server.js",
+    "dev": "node swagger.js && node --watch server.js",
     "swagger": "node swagger.js"
   },
+  "author": ["charles Isama", "Driesers Morales"],
   "keywords": [],
   "type": "commonjs",
   "dependencies": {

@@ -1,69 +1,162 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 // GET all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password');
+
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving users', error: error.message });
+        res.status(500).json({
+            message: 'Error retrieving users',
+            error: error.message
+        });
     }
 };
 
 // GET single user
 exports.getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: 'Invalid user ID'
+            });
         }
+
+        const user = await User.findById(id).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Invalid User ID or server error', error: error.message });
+        res.status(500).json({
+            message: 'Error retrieving user',
+            error: error.message
+        });
     }
 };
 
 // POST create user
 exports.createUser = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, role, major } = req.body;
+        const {
+            firstName,
+            lastName,
+            email,
+            password,
+            role,
+            major
+        } = req.body;
+
         if (!firstName || !lastName || !email || !password || !major) {
-            return res.status(400).json({ message: 'Please provide all required fields' });
+            return res.status(400).json({
+                message:
+                    'Please provide firstName, lastName, email, password, and major'
+            });
         }
-        const newUser = new User({ firstName, lastName, email, password, role, major });
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({
+                message: 'A user with this email already exists'
+            });
+        }
+
+        const newUser = new User({
+            firstName,
+            lastName,
+            email,
+            password,
+            role,
+            major
+        });
+
         const savedUser = await newUser.save();
-        res.status(201).json(savedUser);
+
+        const userResponse = savedUser.toObject();
+        delete userResponse.password;
+
+        res.status(201).json(userResponse);
     } catch (error) {
-        res.status(400).json({ message: 'Error creating user', error: error.message });
+        res.status(400).json({
+            message: 'Error creating user',
+            error: error.message
+        });
     }
 };
 
 // PUT update user
 exports.updateUser = async (req, res) => {
     try {
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: 'Invalid user ID'
+            });
         }
-        res.status(204).send();
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: updatedUser
+        });
     } catch (error) {
-        res.status(400).json({ message: 'Error updating user', error: error.message });
+        res.status(400).json({
+            message: 'Error updating user',
+            error: error.message
+        });
     }
 };
 
 // DELETE user
 exports.deleteUser = async (req, res) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
-        if (!deletedUser) {
-            return res.status(404).json({ message: 'User not found' });
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: 'Invalid user ID'
+            });
         }
-        res.status(200).json({ message: 'User deleted successfully' });
+
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'User deleted successfully'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting user', error: error.message });
+        res.status(500).json({
+            message: 'Error deleting user',
+            error: error.message
+        });
     }
 };
