@@ -5,7 +5,7 @@ const doc = {
         title: 'Campus Study Hub Api',
         description: 'SPI for managing study groups, users, session, and resources.',
     }, 
-    host: process.env.PORT ? 'campus-study-hub.onrender.com' : 'localhost:8080',
+    host: process.env.PORT ? 'https://campus-study-hub-fphx.onrender.com' : 'localhost:8080',
     schemes: ['https', 'http']
 }; 
 
