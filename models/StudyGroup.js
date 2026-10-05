@@ -9,4 +9,4 @@ const studyGroupSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('StudyGroup', studyGroupSchema);
+module.exports = mongoose.model('StudyGroup', studyGroupSchema, 'studygroups');
