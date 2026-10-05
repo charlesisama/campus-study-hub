@@ -1,5 +1,7 @@
 const swaggerAutogen = require('swagger-autogen')();
 
+const isProduction = process.env.RENDER === "true";
+
 const doc = {
     info: {
         title: 'Campus Study Hub API',
@@ -7,8 +9,15 @@ const doc = {
         version: '1.0.0'
     },
    
-    host: process.env.RENDER_EXTERNAL_HOSTNAME || 'campus-study-hub-fphx.onrender.com',
-    schemes: ['https', 'http']
+    host: isProduction
+        ? "https://campus-study-hub-fphx.onrender.com"
+        : "localhost:3000",
+
+    basePath: "/",
+
+    schemes: isProduction
+        ? ["https"]
+        : ["http"],
 };
 
 const outputFile = './swagger/swagger.json';
