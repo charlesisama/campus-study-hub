@@ -5,10 +5,9 @@
     "description": "API for managing study groups, users, sessions, and resources.",
     "version": "1.0.0"
   },
-  "host": "campus-study-hub-fphx.onrender.com",
+  "host": "localhost:3000",
   "basePath": "/",
   "schemes": [
-    "https",
     "http"
   ],
   "paths": {
