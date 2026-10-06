@@ -1,73 +1,54 @@
-const mongoose = require('mongoose');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
-// GET all users
-exports.getAllUsers = async (req, res) => {
+// GET /users
+const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password');
-
+        const users = await User.find();
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({
-            message: 'Error retrieving users',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error retrieving users', error: error.message });
     }
 };
 
-// GET single user
-exports.getUserById = async (req, res) => {
+// GET /users/:id
+const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid user ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
         }
 
-        const user = await User.findById(id).select('-password');
-
+        const user = await User.findById(id);
         if (!user) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
-
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({
-            message: 'Error retrieving user',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error retrieving user', error: error.message });
     }
 };
 
-// POST create user
-exports.createUser = async (req, res) => {
+// POST /users
+const createUser = async (req, res) => {
+    /* #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'User registration details',
+          required: true,
+          schema: {
+            firstName: 'Charles',
+            lastName: 'Isama',
+            email: 'charles@example.com',
+            password: 'securepassword123',
+            role: 'student',
+            major: 'Software Engineering'
+          }
+    } */
     try {
-        const {
-            firstName,
-            lastName,
-            email,
-            password,
-            role,
-            major
-        } = req.body;
+        const { firstName, lastName, email, password, role, major } = req.body;
 
-        if (!firstName || !lastName || !email || !password || !major) {
-            return res.status(400).json({
-                message:
-                    'Please provide firstName, lastName, email, password, and major'
-            });
-        }
-
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({
-                message: 'A user with this email already exists'
-            });
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ message: 'Missing required fields' });
         }
 
         const newUser = new User({
@@ -75,88 +56,75 @@ exports.createUser = async (req, res) => {
             lastName,
             email,
             password,
-            role,
-            major
+            role: role || 'student',
+            major: major || ''
         });
 
         const savedUser = await newUser.save();
-
-        const userResponse = savedUser.toObject();
-        delete userResponse.password;
-
-        res.status(201).json(userResponse);
+        res.status(201).json(savedUser);
     } catch (error) {
-        res.status(400).json({
-            message: 'Error creating user',
-            error: error.message
-        });
+        res.status(400).json({ message: 'Failed to create user', error: error.message });
     }
 };
 
-// PUT update user
-exports.updateUser = async (req, res) => {
+// PUT /users/:id
+const updateUser = async (req, res) => {
+    /* #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'Fields to update for user',
+          required: true,
+          schema: {
+            firstName: 'Charles',
+            lastName: 'Isama',
+            email: 'charles@example.com',
+            role: 'student',
+            major: 'Computer Science'
+          }
+    } */
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid user ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        ).select('-password');
+        const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true
+        });
 
         if (!updatedUser) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({
-            message: 'User updated successfully',
-            user: updatedUser
-        });
+        res.status(204).send();
     } catch (error) {
-        res.status(400).json({
-            message: 'Error updating user',
-            error: error.message
-        });
+        res.status(400).json({ message: 'Failed to update user', error: error.message });
     }
 };
 
-// DELETE user
-exports.deleteUser = async (req, res) => {
+// DELETE /users/:id
+const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid user ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
         }
 
         const deletedUser = await User.findByIdAndDelete(id);
-
         if (!deletedUser) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({
-            message: 'User deleted successfully'
-        });
+        res.status(200).json({ message: 'User deleted successfully', id });
     } catch (error) {
-        res.status(500).json({
-            message: 'Error deleting user',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error deleting user', error: error.message });
     }
+};
+
+module.exports = {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
 };

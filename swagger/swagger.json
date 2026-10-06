@@ -39,26 +39,34 @@
           {
             "name": "body",
             "in": "body",
+            "description": "User registration details",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "firstName": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Charles"
                 },
                 "lastName": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Isama"
                 },
                 "email": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "charles@example.com"
                 },
                 "password": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "securepassword123"
                 },
                 "role": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "student"
                 },
                 "major": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Software Engineering"
                 }
               }
             }
@@ -108,11 +116,42 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Fields to update for user",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "example": "Charles"
+                },
+                "lastName": {
+                  "type": "string",
+                  "example": "Isama"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "charles@example.com"
+                },
+                "role": {
+                  "type": "string",
+                  "example": "student"
+                },
+                "major": {
+                  "type": "string",
+                  "example": "Computer Science"
+                }
+              }
+            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request"
@@ -166,23 +205,31 @@
           {
             "name": "body",
             "in": "body",
+            "description": "New study group details",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "name": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "CSE 341 Web Services Study Group"
                 },
                 "course": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "CSE 341"
                 },
                 "description": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Collaborative API development study team"
                 },
                 "ownerId": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "650c1f1e2f3a4b5c6d7e8f01"
                 },
                 "members": {
-                  "example": "any"
+                  "type": "array",
+                  "example": [],
+                  "items": {}
                 }
               }
             }
@@ -232,11 +279,38 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Fields to update for study group",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "CSE 341 Advanced API Group"
+                },
+                "course": {
+                  "type": "string",
+                  "example": "CSE 341"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Updated study session goals and schedules"
+                },
+                "ownerId": {
+                  "type": "string",
+                  "example": "650c1f1e2f3a4b5c6d7e8f01"
+                }
+              }
+            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request"

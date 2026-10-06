@@ -1,167 +1,127 @@
-const mongoose = require('mongoose');
 const StudyGroup = require('../models/StudyGroup');
+const mongoose = require('mongoose');
 
-// GET all study groups
-exports.getAllGroups = async (req, res) => {
+// GET /groups
+const getAllGroups = async (req, res) => {
     try {
-        const groups = await StudyGroup.find()
-            .populate('ownerId', 'firstName lastName email')
-            .populate('members', 'firstName lastName email');
-
+        const groups = await StudyGroup.find();
         res.status(200).json(groups);
     } catch (error) {
-        res.status(500).json({
-            message: 'Error retrieving study groups',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error retrieving study groups', error: error.message });
     }
 };
 
-// GET single study group
-exports.getGroupById = async (req, res) => {
+// GET /groups/:id
+const getGroupById = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid study group ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid group ID format' });
         }
 
-        const group = await StudyGroup.findById(id)
-            .populate('ownerId', 'firstName lastName email')
-            .populate('members', 'firstName lastName email');
-
+        const group = await StudyGroup.findById(id);
         if (!group) {
-            return res.status(404).json({
-                message: 'Study group not found'
-            });
+            return res.status(404).json({ message: 'Study group not found' });
         }
-
         res.status(200).json(group);
     } catch (error) {
-        res.status(500).json({
-            message: 'Error retrieving study group',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error retrieving study group', error: error.message });
     }
 };
 
-// POST create study group
-exports.createGroup = async (req, res) => {
+// POST /groups
+const createGroup = async (req, res) => {
+    /* #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'New study group details',
+          required: true,
+          schema: {
+            name: 'CSE 341 Web Services Study Group',
+            course: 'CSE 341',
+            description: 'Collaborative API development study team',
+            ownerId: '650c1f1e2f3a4b5c6d7e8f01',
+            members: []
+          }
+    } */
     try {
-        const {
-            name,
-            course,
-            description,
-            ownerId,
-            members
-        } = req.body;
+        const { name, course, description, ownerId, members } = req.body;
 
-        if (!name || !course || !description || !ownerId) {
-            return res.status(400).json({
-                message:
-                    'Please provide name, course, description, and ownerId'
-            });
-        }
-
-        if (!mongoose.isValidObjectId(ownerId)) {
-            return res.status(400).json({
-                message: 'Invalid ownerId'
-            });
-        }
-
-        if (members && !Array.isArray(members)) {
-            return res.status(400).json({
-                message: 'members must be an array'
-            });
+        if (!name || !course || !ownerId) {
+            return res.status(400).json({ message: 'Missing required fields (name, course, ownerId)' });
         }
 
         const newGroup = new StudyGroup({
             name,
             course,
-            description,
+            description: description || '',
             ownerId,
-            members: members || []
+            members: members || [ownerId]
         });
 
         const savedGroup = await newGroup.save();
-
         res.status(201).json(savedGroup);
     } catch (error) {
-        res.status(400).json({
-            message: 'Error creating study group',
-            error: error.message
-        });
+        res.status(400).json({ message: 'Failed to create study group', error: error.message });
     }
 };
 
-// PUT update study group
-exports.updateGroup = async (req, res) => {
+// PUT /groups/:id
+const updateGroup = async (req, res) => {
+    /* #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'Fields to update for study group',
+          required: true,
+          schema: {
+            name: 'CSE 341 Advanced API Group',
+            course: 'CSE 341',
+            description: 'Updated study session goals and schedules',
+            ownerId: '650c1f1e2f3a4b5c6d7e8f01'
+          }
+    } */
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid study group ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid group ID format' });
         }
 
-        const updatedGroup = await StudyGroup.findByIdAndUpdate(
-            id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        )
-            .populate('ownerId', 'firstName lastName email')
-            .populate('members', 'firstName lastName email');
+        const updatedGroup = await StudyGroup.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true
+        });
 
         if (!updatedGroup) {
-            return res.status(404).json({
-                message: 'Study group not found'
-            });
+            return res.status(404).json({ message: 'Study group not found' });
         }
 
-        res.status(200).json({
-            message: 'Study group updated successfully',
-            group: updatedGroup
-        });
+        res.status(204).send();
     } catch (error) {
-        res.status(400).json({
-            message: 'Error updating study group',
-            error: error.message
-        });
+        res.status(400).json({ message: 'Failed to update study group', error: error.message });
     }
 };
 
-// DELETE study group
-exports.deleteGroup = async (req, res) => {
+// DELETE /groups/:id
+const deleteGroup = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid study group ID'
-            });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid group ID format' });
         }
 
         const deletedGroup = await StudyGroup.findByIdAndDelete(id);
-
         if (!deletedGroup) {
-            return res.status(404).json({
-                message: 'Study group not found'
-            });
+            return res.status(404).json({ message: 'Study group not found' });
         }
 
-        res.status(200).json({
-            message: 'Study group deleted successfully'
-        });
+        res.status(200).json({ message: 'Study group deleted successfully', id });
     } catch (error) {
-        res.status(500).json({
-            message: 'Error deleting study group',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Error deleting study group', error: error.message });
     }
+};
+
+module.exports = {
+    getAllGroups,
+    getGroupById,
+    createGroup,
+    updateGroup,
+    deleteGroup
 };
