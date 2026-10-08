@@ -69,39 +69,66 @@ const createUser = async (req, res) => {
 
 // PUT /users/:id
 const updateUser = async (req, res) => {
-    /* #swagger.parameters['body'] = {
-          in: 'body',
-          description: 'Fields to update for user',
-          required: true,
-          schema: {
-            firstName: 'Charles',
-            lastName: 'Isama',
-            email: 'charles@example.com',
-            role: 'student',
-            major: 'Computer Science'
-          }
-    } */
+
     try {
+
         const { id } = req.params;
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid user ID format' });
+            return res.status(400).json({
+                message: 'Invalid user ID format'
+            });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-            new: true,
-            runValidators: true
-        });
+        const {
+            firstName,
+            lastName,
+            email,
+            password,
+            role,
+            major
+        } = req.body;
+
+        if (!firstName || !lastName || !email || !password || !role || !major) {
+            return res.status(400).json({
+                message: 'All required fields must be provided'
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            {
+                firstName,
+                lastName,
+                email,
+                password,
+                role,
+                major
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select('-password');
 
         if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({
+                message: 'User not found'
+            });
         }
 
-        res.status(204).send();
-    } catch (error) {
-        res.status(400).json({ message: 'Failed to update user', error: error.message });
-    }
-};
+        res.status(200).json(updatedUser);
 
+    } catch (error) {
+
+        res.status(400).json({
+            message: 'Failed to update user',
+            error: error.message
+        });
+
+    }
+
+};
 // DELETE /users/:id
 const deleteUser = async (req, res) => {
     try {

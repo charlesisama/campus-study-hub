@@ -67,38 +67,70 @@ const createGroup = async (req, res) => {
 
 // PUT /groups/:id
 const updateGroup = async (req, res) => {
-    /* #swagger.parameters['body'] = {
-          in: 'body',
-          description: 'Fields to update for study group',
-          required: true,
-          schema: {
-            name: 'CSE 341 Advanced API Group',
-            course: 'CSE 341',
-            description: 'Updated study session goals and schedules',
-            ownerId: '650c1f1e2f3a4b5c6d7e8f01'
-          }
-    } */
+
     try {
+
         const { id } = req.params;
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid group ID format' });
+            return res.status(400).json({
+                message: 'Invalid group ID format'
+            });
         }
 
-        const updatedGroup = await StudyGroup.findByIdAndUpdate(id, req.body, {
-            new: true,
-            runValidators: true
-        });
+        const {
+            name,
+            course,
+            description,
+            ownerId,
+            members
+        } = req.body;
+
+        if (!name || !course || !description || !ownerId) {
+            return res.status(400).json({
+                message: 'Name, course, description, and ownerId are required'
+            });
+        }
+
+        if (members !== undefined && !Array.isArray(members)) {
+            return res.status(400).json({
+                message: 'Members must be an array'
+            });
+        }
+
+        const updatedGroup = await StudyGroup.findByIdAndUpdate(
+            id,
+            {
+                name,
+                course,
+                description,
+                ownerId,
+                members: members || []
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
 
         if (!updatedGroup) {
-            return res.status(404).json({ message: 'Study group not found' });
+            return res.status(404).json({
+                message: 'Study group not found'
+            });
         }
 
-        res.status(204).send();
-    } catch (error) {
-        res.status(400).json({ message: 'Failed to update study group', error: error.message });
-    }
-};
+        res.status(200).json(updatedGroup);
 
+    } catch (error) {
+
+        res.status(400).json({
+            message: 'Failed to update study group',
+            error: error.message
+        });
+
+    }
+
+};
 // DELETE /groups/:id
 const deleteGroup = async (req, res) => {
     try {

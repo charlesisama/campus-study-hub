@@ -11,9 +11,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-connectDB();
-
 // Main Routes
 app.use('/', require('./routes/index.js'));
 
@@ -27,6 +24,13 @@ app.get('/health', (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
-    console.log(`Campus Study Hub API running on port ${PORT}`);
-});
+// Start server only when running server.js directly
+if (require.main === module) {
+    connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`Campus Study Hub API running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

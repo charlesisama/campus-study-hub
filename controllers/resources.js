@@ -113,16 +113,36 @@ const updateResource = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-
             return res.status(400).json({
                 message: 'Invalid resource ID format'
             });
+        }
 
+        const {
+            title,
+            url,
+            type,
+            description,
+            groupId,
+            uploadedBy
+        } = req.body;
+
+        if (!title || !url || !type || !description || !groupId || !uploadedBy) {
+            return res.status(400).json({
+                message: 'Title, URL, type, description, groupId, and uploadedBy are required'
+            });
         }
 
         const updatedResource = await Resource.findByIdAndUpdate(
             id,
-            req.body,
+            {
+                title,
+                url,
+                type,
+                description,
+                groupId,
+                uploadedBy
+            },
             {
                 new: true,
                 runValidators: true
@@ -130,11 +150,9 @@ const updateResource = async (req, res) => {
         );
 
         if (!updatedResource) {
-
             return res.status(404).json({
                 message: 'Resource not found'
             });
-
         }
 
         res.status(200).json(updatedResource);

@@ -120,38 +120,34 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Fields to update for user",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "firstName": {
-                  "type": "string",
-                  "example": "Charles"
+                  "example": "any"
                 },
                 "lastName": {
-                  "type": "string",
-                  "example": "Isama"
+                  "example": "any"
                 },
                 "email": {
-                  "type": "string",
-                  "example": "charles@example.com"
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
                 },
                 "role": {
-                  "type": "string",
-                  "example": "student"
+                  "example": "any"
                 },
                 "major": {
-                  "type": "string",
-                  "example": "Computer Science"
+                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -283,34 +279,31 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Fields to update for study group",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "name": {
-                  "type": "string",
-                  "example": "CSE 341 Advanced API Group"
+                  "example": "any"
                 },
                 "course": {
-                  "type": "string",
-                  "example": "CSE 341"
+                  "example": "any"
                 },
                 "description": {
-                  "type": "string",
-                  "example": "Updated study session goals and schedules"
+                  "example": "any"
                 },
                 "ownerId": {
-                  "type": "string",
-                  "example": "650c1f1e2f3a4b5c6d7e8f01"
+                  "example": "any"
+                },
+                "members": {
+                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -433,6 +426,33 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "groupId": {
+                  "example": "any"
+                },
+                "date": {
+                  "example": "any"
+                },
+                "location": {
+                  "example": "any"
+                },
+                "topic": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "attendees": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -560,6 +580,33 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "any"
+                },
+                "url": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "groupId": {
+                  "example": "any"
+                },
+                "uploadedBy": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {

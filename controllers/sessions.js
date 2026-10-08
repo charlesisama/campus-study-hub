@@ -113,16 +113,42 @@ const updateSession = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-
             return res.status(400).json({
                 message: 'Invalid session ID format'
             });
+        }
 
+        const {
+            groupId,
+            date,
+            location,
+            topic,
+            description,
+            attendees
+        } = req.body;
+
+        if (!groupId || !date || !location || !topic || !description) {
+            return res.status(400).json({
+                message: 'Group ID, date, location, topic, and description are required'
+            });
+        }
+
+        if (attendees !== undefined && !Array.isArray(attendees)) {
+            return res.status(400).json({
+                message: 'Attendees must be an array'
+            });
         }
 
         const updatedSession = await Session.findByIdAndUpdate(
             id,
-            req.body,
+            {
+                groupId,
+                date,
+                location,
+                topic,
+                description,
+                attendees: attendees || []
+            },
             {
                 new: true,
                 runValidators: true
@@ -130,11 +156,9 @@ const updateSession = async (req, res) => {
         );
 
         if (!updatedSession) {
-
             return res.status(404).json({
                 message: 'Study session not found'
             });
-
         }
 
         res.status(200).json(updatedSession);
