@@ -15,5 +15,6 @@ router.use('/users', require('./users'));
 router.use('/groups', require('./groups'));
 router.use('/sessions', require('./sessions'));
 router.use('/resources', require('./resources'));
+router.use('/auth', require('./auth'));
 
 module.exports = router;
